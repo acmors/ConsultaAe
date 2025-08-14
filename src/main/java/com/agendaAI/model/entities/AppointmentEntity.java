@@ -1,10 +1,7 @@
 package com.agendaAI.model.entities;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 
 import java.time.LocalDateTime;
@@ -16,6 +13,7 @@ import java.util.UUID;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class AppointmentEntity {
 
     @Id
@@ -24,13 +22,13 @@ public class AppointmentEntity {
     @Column(name = "id", updatable = false, nullable = false)
     private UUID id;
 
-    private LocalDateTime dataTime;
+    private LocalDateTime scheduledAt;
 
     @ManyToOne
     private DoctorEntity doctor;
 
     @ManyToOne
-    private PatientEntity pacient;
+    private PatientEntity patient;
 
     private String reason;
 }

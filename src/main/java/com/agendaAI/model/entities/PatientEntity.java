@@ -26,11 +26,11 @@ public class PatientEntity {
     @Column(name = "patient_name", nullable = false)
     private String name;
 
-    @Column(name = "patient_birthDate", nullable = false)
+    @Column(name = "patient_birthDate")
     private LocalDate birthDate;
 
     @CPF
-    @Column(unique = true, nullable = false)
+    @Column(unique = true)
     private String cpf;
 
 }
