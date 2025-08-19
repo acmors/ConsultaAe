@@ -1,5 +1,7 @@
 package com.agendaAI.service;
 
+import com.agendaAI.exception.RecordNotFoundException;
+import com.agendaAI.exception.ResourceAlreadyExistsException;
 import com.agendaAI.model.dto.request.PatientRequest;
 import com.agendaAI.model.dto.response.PatientResponse;
 import com.agendaAI.model.entities.PatientEntity;
@@ -18,7 +20,7 @@ public class PatientService {
 
     public PatientResponse createPatient(PatientRequest request){
         if(patientRepo.findByCpf(request.cpf()).isPresent()){
-            throw new RuntimeException("Paciente já cadastrado.");
+            throw new ResourceAlreadyExistsException("Paciente já cadastrado.");
         }
 
         PatientEntity patient = PatientEntity.builder()
@@ -39,7 +41,7 @@ public class PatientService {
 
     public PatientResponse findPatientByCpf(String cpf){
         PatientEntity patientEntity = patientRepo.findByCpf(cpf)
-                .orElseThrow(() -> new RuntimeException("CPF não encontrado"));
+                .orElseThrow(() -> new RecordNotFoundException("Nenhum paciente encontrado com o CPF: " + cpf));
 
         return new PatientResponse(
                 patientEntity.getId(),
@@ -61,10 +63,10 @@ public class PatientService {
 
     public PatientResponse updatePatientByCpf(String cpf, PatientRequest request){
         PatientEntity existingPatient = patientRepo.findByCpf(cpf)
-                .orElseThrow(() -> new RuntimeException("CPF não encontrado"));
+                .orElseThrow(() -> new RecordNotFoundException("Nenhum paciente encontrado com o CPF: " + cpf));
 
         if(!request.cpf().equals(existingPatient.getCpf()) && patientRepo.findByCpf(request.cpf()).isPresent()){
-            throw new RuntimeException("Paciente com CPF" + request.cpf() + " já existe.");
+            throw new ResourceAlreadyExistsException("Paciente com CPF" + request.cpf() + " já existe.");
         }
 
         existingPatient.setName(request.name());
@@ -84,7 +86,7 @@ public class PatientService {
 
     public void deletePatientByCpf(String cpf){
         PatientEntity patient = patientRepo.findByCpf(cpf)
-                .orElseThrow(() -> new RuntimeException("Paciente com CPF " + cpf + " não encontrado"));
+                .orElseThrow(() -> new RecordNotFoundException("Nenhum paciente encontrado com o CPF: " + cpf));
 
         patientRepo.delete(patient);
     }

@@ -1,5 +1,6 @@
 package com.agendaAI.service;
 
+import com.agendaAI.exception.RecordNotFoundException;
 import com.agendaAI.model.dto.request.AppointmentRequest;
 import com.agendaAI.model.dto.response.AppointmentResponse;
 import com.agendaAI.model.entities.AppointmentEntity;
@@ -10,7 +11,6 @@ import com.agendaAI.repo.DoctorRepo;
 import com.agendaAI.repo.PatientRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.util.UUID;
 
 @Service
@@ -27,10 +27,10 @@ public class AppointmentService {
 
     public AppointmentResponse createAppointment(AppointmentRequest request){
         DoctorEntity doctor = doctorRepo.findById(request.doctorId())
-                .orElseThrow(() -> new RuntimeException("Médico nao encontrado"));
+                .orElseThrow(() -> new RecordNotFoundException("Médico não encontrado"));
 
         PatientEntity patient = patientRepo.findById(request.patientId())
-                .orElseThrow(() -> new RuntimeException("Paciente não encontrado"));
+                .orElseThrow(() -> new RecordNotFoundException("Paciente não encontrado"));
 
         AppointmentEntity appointment = AppointmentEntity.builder()
                 .scheduledAt(request.localDateTime())
@@ -55,7 +55,7 @@ public class AppointmentService {
 
     public AppointmentResponse findAppointmentByPatient(String cpf){
         AppointmentEntity appointment = appointmentRepo.findByPatientCpf(cpf)
-                .orElseThrow(() -> new RuntimeException("Agendamento nao encontrado"));
+                .orElseThrow(() -> new RecordNotFoundException("Agendamento não encontrado"));
 
         return new AppointmentResponse(
                 appointment.getId(),
@@ -70,7 +70,7 @@ public class AppointmentService {
 
     public AppointmentResponse getAppointmentByID(UUID id){
         AppointmentEntity appointment = appointmentRepo.findById(id)
-                .orElseThrow(() -> new RuntimeException("Agendamento nao encontrado"));
+                .orElseThrow(() -> new RecordNotFoundException("Agendamento nao encontrado"));
 
         return new AppointmentResponse(
                 appointment.getId(),
@@ -85,20 +85,20 @@ public class AppointmentService {
 
     public void deleteAppointment(UUID id){
         AppointmentEntity appointment = appointmentRepo.findById(id)
-                    .orElseThrow(() -> new RuntimeException("Consulta não encontrada."));
+                    .orElseThrow(() -> new RecordNotFoundException("Consulta não encontrada."));
 
         appointmentRepo.delete(appointment);
     }
 
     public AppointmentResponse updateAppointment(UUID id, AppointmentRequest request){
         AppointmentEntity appointmentExisting = appointmentRepo.findById(id)
-                .orElseThrow(() -> new RuntimeException("Consulta não encontrada."));
+                .orElseThrow(() -> new RecordNotFoundException("Consulta não encontrada."));
 
         DoctorEntity doctor = doctorRepo.findById(request.doctorId())
-                .orElseThrow(() -> new RuntimeException("Médico não encontrado."));
+                .orElseThrow(() -> new RecordNotFoundException("Médico não encontrado."));
 
         PatientEntity patient = patientRepo.findById(request.patientId())
-                .orElseThrow(() -> new RuntimeException("Paciente não encontrado."));
+                .orElseThrow(() -> new RecordNotFoundException("Paciente não encontrado."));
 
         appointmentExisting.setScheduledAt(request.localDateTime());
         appointmentExisting.setDoctor(doctor);

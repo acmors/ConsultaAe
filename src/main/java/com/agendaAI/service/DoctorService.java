@@ -1,5 +1,7 @@
 package com.agendaAI.service;
 
+import com.agendaAI.exception.RecordNotFoundException;
+import com.agendaAI.exception.ResourceAlreadyExistsException;
 import com.agendaAI.model.dto.request.DoctorRequest;
 import com.agendaAI.model.dto.response.DoctorResponse;
 import com.agendaAI.model.entities.DoctorEntity;
@@ -18,7 +20,7 @@ public class DoctorService {
     public DoctorResponse createDoctor(DoctorRequest request){
 
         if(doctorRepo.findByCrm(request.crm()).isPresent()){
-            throw new RuntimeException("CRM já existente nesta unidaede");
+            throw new ResourceAlreadyExistsException("Médico já existe.");
         }
 
         DoctorEntity doctor = DoctorEntity.builder()
@@ -40,7 +42,7 @@ public class DoctorService {
 
     public DoctorResponse findDoctorByCrm(String crm){
         DoctorEntity doctorEntity = doctorRepo.findByCrm(crm)
-                .orElseThrow(() -> new RuntimeException("There is not a Doctor with this crm."));
+                .orElseThrow(() -> new RecordNotFoundException("Nenhum médico encontrado com o CRM: " + crm));
         return new DoctorResponse(
                 doctorEntity.getId(),
                 doctorEntity.getName(),
@@ -62,10 +64,10 @@ public class DoctorService {
 
     public DoctorResponse updateDoctorByCrm(String crm, DoctorRequest request){
         DoctorEntity existingDoctor = doctorRepo.findByCrm(crm)
-                .orElseThrow(() -> new RuntimeException("Médico com CRM " + request.crm() + " não encontrado"));
+                .orElseThrow(() -> new RecordNotFoundException("Nenhum médico encontrado com o CRM: " + crm));
 
         if(!request.crm().equals(existingDoctor.getCrm()) && doctorRepo.findByCrm(request.crm()).isPresent()){
-            throw new RuntimeException("Médico com CRM " + request.crm() + " já cadastrado.");
+            throw new ResourceAlreadyExistsException("Médico com CRM " + request.crm() + " já cadastrado.");
         }
 
         existingDoctor.setName(request.name());
@@ -84,7 +86,7 @@ public class DoctorService {
 
     public void deleteDoctorByCrm(String crm){
         DoctorEntity doctor = doctorRepo.findByCrm(crm)
-                .orElseThrow(() -> new RuntimeException("Médico com CRM " + crm + " não encontrado."));
+                .orElseThrow(() -> new RecordNotFoundException("Nenhum médico encontrado com o CRM: " + crm));
 
         doctorRepo.delete(doctor);
     }
