@@ -30,7 +30,7 @@ public class PatientController {
 
     @GetMapping
     public ResponseEntity<List<PatientResponse>> getAllPatients(){
-        return ResponseEntity.ok(patientService.findAllPacients());
+        return ResponseEntity.ok(patientService.findAllPatients());
     }
 
     @PutMapping("/{cpf}")

@@ -50,7 +50,7 @@ public class PatientService {
                 patientEntity.getCpf());
     }
 
-    public List<PatientResponse> findAllPacients(){
+    public List<PatientResponse> findAllPatients(){
         List<PatientEntity> patients = patientRepo.findAll();
         return patients.stream()
                 .map(patient -> new PatientResponse(
